@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ActivityIndicator, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Details'>;
 type PokemonDetails = {
@@ -15,11 +16,19 @@ export default function DetailsScreen({ route }: Props) {
   const { id } = route.params;
   const [data, setData] = useState<PokemonDetails | null>(null);
 
-  useEffect(() => {
+    useEffect(() => {
     fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
-      .then(res => res.json())
-      .then(setData);
-  }, [id]);
+        .then(res => res.json())
+        .then(poke => {
+        setData(poke);
+        // salva no AsyncStorage
+        AsyncStorage.setItem(
+            '@lastPokemon',
+            JSON.stringify({ id, name: poke.name })
+        );
+        })
+        .catch(console.error);
+    }, [id]);
 
   if (!data) return <ActivityIndicator style={{ flex: 1 }} />;
 

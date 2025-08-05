@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,11 @@ import {
   ActivityIndicator,
   StyleSheet
 } from 'react-native';
-import { CompositeScreenProps } from '@react-navigation/native';
+import { CompositeScreenProps, useFocusEffect } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { TabParamList, RootStackParamList } from '../navigation';
 
 type HomeProps = CompositeScreenProps<
@@ -18,16 +20,29 @@ type HomeProps = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-type Pokemon = {
-  name: string;
-  url: string;
-};
+type Last = { id: number; name: string } | null;
+type Pokemon = { name: string; url: string };
 
 const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
+  const [last, setLast] = useState<Last>(null);
   const [list, setList] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
+  // 1) Busca último visto TODA VEZ que a tela recebe foco:
+  useFocusEffect(
+    useCallback(() => {
+      AsyncStorage.getItem('@lastPokemon')
+        .then(value => {
+          if (value) {
+            setLast(JSON.parse(value));
+          }
+        })
+        .catch(console.error);
+    }, [])
+  );
+
+  // 2) Carrega a lista APENAS no primeiro mount:
+  React.useEffect(() => {
     fetch('https://pokeapi.co/api/v2/pokemon?limit=150')
       .then(res => res.json())
       .then(json => setList(json.results))
@@ -45,6 +60,20 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* ─── Card do último Pokémon visto ─── */}
+      {last && (
+        <TouchableOpacity
+          style={styles.last}
+          onPress={() => navigation.navigate('Details', { id: last.id })}
+        >
+          <Text style={styles.lastText}>
+            🎯 Último visto: #{last.id}{' '}
+            {last.name[0].toUpperCase() + last.name.slice(1)}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {/* ─── Lista de Pokémons ─── */}
       <FlatList
         data={list}
         keyExtractor={item => item.name}
@@ -56,7 +85,7 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
               onPress={() => navigation.navigate('Details', { id })}
             >
               <Text style={styles.text}>
-                {`${id}. ${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`}
+                {`${id}. ${item.name[0].toUpperCase() + item.name.slice(1)}`}
               </Text>
             </TouchableOpacity>
           );
@@ -69,21 +98,19 @@ const HomeScreen: React.FC<HomeProps> = ({ navigation }) => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16
+  container: { flex: 1, padding: 16 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  last: {
+    padding: 12,
+    marginBottom: 12,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 4
   },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
+  lastText: { fontWeight: 'bold', fontSize: 16 },
   item: {
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd'
   },
-  text: {
-    fontSize: 16
-  }
+  text: { fontSize: 16 }
 });
