@@ -21,7 +21,8 @@ const { width } = Dimensions.get('window');
 const ITEM_HEIGHT = 80;
 
 export function TypeListScreen({ navigation, route }: Props) {
-  const { type } = route.params;
+  const { type } = route.params; // extrai o tipo da rota
+  // utiliza o hook personalizado para buscar Pokémons por tipo
   const { list, loading, error } = usePokemonsByType(type);
 
   // extrai ID da URL

@@ -21,7 +21,7 @@ const TYPES_ORDER = [
 ];
 
 const HomeScreen: React.FC<any> = ({ navigation }) => {
-  const { list, loading } = usePokemonList(150);
+  const { list, loading } = usePokemonList(150); // aqui utilizamos o hook personalizado
   const { last, refresh } = useLastViewedPokemon();
 
   useFocusEffect(useCallback(() => { refresh(); }, [refresh]));
