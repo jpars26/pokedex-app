@@ -1,8 +1,9 @@
+// src/services/__tests__/TypeSelectionScreen.test.tsx
+
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { render, fireEvent } from '@testing-library/react-native';
 import { TypeSelectionScreen } from '../../screens/TypeSelectionScreen';
 
-// mock hook pra não depender de rede
 jest.mock('../../hooks/usePokemonTypes', () => ({
   usePokemonTypes: () => ({
     types: [
@@ -10,7 +11,7 @@ jest.mock('../../hooks/usePokemonTypes', () => ({
       { name: 'water', url: '' },
     ],
     loading: false,
-    error: null
+    error: null,
   })
 }));
 
@@ -22,17 +23,22 @@ describe('TypeSelectionScreen', () => {
     navigate.mockClear();
   });
 
-  it('deve renderizar os ícones e navegar ao clicar', async () => {
-    const { getByText } = render(<TypeSelectionScreen {...props} />);
-    
-    // Verifica se os tipos estão sendo renderizados
-    expect(getByText('fire')).toBeTruthy();
-    expect(getByText('water')).toBeTruthy();
+  it('renderiza título e navega ao clicar nos ícones', () => {
+    const { getByText, getByTestId } = render(
+      <TypeSelectionScreen {...props} />
+    );
 
-    // Simula o clique no primeiro tipo
-    const fireButton = getByText('fire');
+    // 1) Verifica título
+    expect(getByText('Escolha o tipo do Pokémon')).toBeTruthy();
+
+    // 2) Clica no botão com testID "type-fire"
+    const fireButton = getByTestId('type-fire');
     fireEvent.press(fireButton);
-    
     expect(navigate).toHaveBeenCalledWith('TypeList', { type: 'fire' });
+
+    // 3) Clica no botão "type-water"
+    const waterButton = getByTestId('type-water');
+    fireEvent.press(waterButton);
+    expect(navigate).toHaveBeenCalledWith('TypeList', { type: 'water' });
   });
 });

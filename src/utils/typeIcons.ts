@@ -1,0 +1,21 @@
+// src/utils/typeIcons.ts
+export const typeIcons: Record<string, any> = {
+  bug:      require('../../assets/elements/bug.png'),
+  dark:     require('../../assets/elements/dark.png'),
+  dragon:   require('../../assets/elements/dragon.png'),
+  electric: require('../../assets/elements/electric.png'),
+  fairy:    require('../../assets/elements/fairy.png'),
+  fighting: require('../../assets/elements/fighting.png'),
+  fire:     require('../../assets/elements/fire.png'),
+  flying:   require('../../assets/elements/flying.png'),
+  ghost:    require('../../assets/elements/ghost.png'),
+  grass:    require('../../assets/elements/grass.png'),
+  ground:   require('../../assets/elements/ground.png'),
+  ice:      require('../../assets/elements/ice.png'),
+  normal:   require('../../assets/elements/normal.png'),
+  poison:   require('../../assets/elements/poison.png'),
+  psychic:  require('../../assets/elements/psychic.png'),
+  rock:     require('../../assets/elements/rock.png'),
+  steel:    require('../../assets/elements/steel.png'),
+  water:    require('../../assets/elements/water.png'),
+};

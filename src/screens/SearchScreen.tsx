@@ -36,7 +36,7 @@ const SearchScreen: React.FC<SearchProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Nome ou ID do Pokémon"
+        placeholder="ID do Pokémon"
         value={term}
         onChangeText={setTerm}
         autoCapitalize="none"
